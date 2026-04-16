@@ -2,42 +2,34 @@ package co.edu.poli.examen2_Nustes.servicios;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class ConexionBD {
 
-	private static ConexionBD instancia;
-	private Connection conexion;
+    private static ConexionBD instancia;
+    private Connection conexion;
 
-	private ConexionBD() throws Exception {
+    private ConexionBD() throws Exception {
+    	String url = "jdbc:mysql://localhost:3307/examen_2_nustes?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        String user = "root";
+        String pass = "";
 
-		Dotenv dotenv = Dotenv.load();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conexion = DriverManager.getConnection(url, user, pass);
+    }
 
-		String url = dotenv.get("DB_URL");
-		String user = dotenv.get("DB_USER");
-		String pass = dotenv.get("DB_PASSWORD");
+    public static ConexionBD getInstancia() throws Exception {
+        if (instancia == null) {
+            instancia = new ConexionBD();
+        }
+        return instancia;
+    }
 
-		if (url == null || user == null || pass == null) {
-			throw new RuntimeException("Faltan variables en el .env");
-		}
-
-		Class.forName("com.mysql.cj.jdbc.Driver");
-		conexion = DriverManager.getConnection(url, user, pass);
-	}
-
-	public static ConexionBD getInstancia() throws Exception {
-		if (instancia == null) {
-			instancia = new ConexionBD();
-		}
-		return instancia;
-	}
-
-	public Connection getConexion() throws Exception {
-		if (conexion == null || conexion.isClosed()) {
-			instancia = new ConexionBD();
-			return instancia.conexion;
-		}
-		return conexion;
-	}
+    public Connection getConexion() throws Exception {
+        if (conexion == null || conexion.isClosed()) {
+            instancia = new ConexionBD();
+            return instancia.conexion;
+        }
+        return conexion;
+    }
 }

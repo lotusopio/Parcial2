@@ -11,33 +11,36 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="215.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="co.edu.poli.examen2_Soto.controlador.ControlFormCard">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="215.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="co.edu.poli.examen2_Nustes.controlador.ControlFormCard">
   <tabs>
     <Tab text="Consultar">
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
                   <Button fx:id="bttConsulta" layoutX="314.0" layoutY="38.0" mnemonicParsing="false" onAction="#pressConsulta" prefHeight="25.0" prefWidth="144.0" text="Consulta" />
-                  <TextField fx:id="txtTarjeta1" layoutX="127.0" layoutY="38.0" promptText="Numero tarjeta" />
+                  <TextField fx:id="txtSeguro1" layoutX="127.0" layoutY="38.0" promptText="Numero seguro" />
                   <TextArea fx:id="txtAreaResultado" layoutX="69.0" layoutY="78.0" prefHeight="76.0" prefWidth="462.0" editable="false" />
-               </children></AnchorPane>
+               </children>
+        </AnchorPane>
       </content>
     </Tab>
     <Tab text="Crear">
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="206.0" prefWidth="557.0">
                <children>
-                  <TextField fx:id="txtTarjeta2" layoutX="46.0" layoutY="50.0" promptText="Numero tarjeta" />
+                  <TextField fx:id="txtSeguro2" layoutX="46.0" layoutY="50.0" promptText="Numero seguro" />
                   <DatePicker fx:id="datepk1" layoutX="225.0" layoutY="50.0" prefWidth="150.0" promptText="Fecha Expedición" />
-                  <ComboBox fx:id="cmbTitular" layoutX="408.0" layoutY="50.0" prefHeight="25.0" prefWidth="150.0" promptText="Titular" />
-                  <RadioButton fx:id="radio1" prefWidth="200" layoutX="107.0" layoutY="125.0" mnemonicParsing="false" selected="true" text="Débito">
+                  <ComboBox fx:id="cmbAsegurado" layoutX="408.0" layoutY="50.0" prefHeight="25.0" prefWidth="150.0" promptText="Asegurado" />
+                  <TextField fx:id="txtExtra" layoutX="46.0" layoutY="125.0" promptText="Beneficiario / Marca" />
+                  <RadioButton fx:id="radio1" prefWidth="200" layoutX="107.0" layoutY="160.0" mnemonicParsing="false" selected="true" text="Seguro Vida">
                      <toggleGroup>
                         <ToggleGroup fx:id="tipo" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="radio2" prefWidth="200" layoutX="270.0" layoutY="125.0" mnemonicParsing="false" text="Crédito" toggleGroup="$tipo" />
+                  <RadioButton fx:id="radio2" prefWidth="200" layoutX="270.0" layoutY="160.0" mnemonicParsing="false" text="Seguro Vehículo" toggleGroup="$tipo" />
                   <Button fx:id="bttCreacion" layoutX="408.0" layoutY="121.0" mnemonicParsing="false" onAction="#pressCreacion" prefHeight="25.0" prefWidth="150.0" text="Creación" />
-               </children></AnchorPane>
+               </children>
+        </AnchorPane>
       </content>
     </Tab>
   </tabs>

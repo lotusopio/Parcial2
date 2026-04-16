@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import co.edu.poli.examen2_Nustes.modelo.Credito;
-import co.edu.poli.examen2_Nustes.modelo.Debito;
-import co.edu.poli.examen2_Nustes.modelo.Tarjeta;
-import co.edu.poli.examen2_Nustes.modelo.Titular;
-import co.edu.poli.examen2_Nustes.servicios.DAOTarjeta;
-import co.edu.poli.examen2_Nustes.servicios.DAOTitular;
+import co.edu.poli.examen2_Nustes.modelo.Asegurado;
+import co.edu.poli.examen2_Nustes.modelo.Seguro;
+import co.edu.poli.examen2_Nustes.modelo.SeguroVida;
+import co.edu.poli.examen2_Nustes.modelo.SeguroVehiculo;
+import co.edu.poli.examen2_Nustes.servicios.DAOSeguro;
+import co.edu.poli.examen2_Nustes.servicios.DAOAsegurado;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -25,147 +25,153 @@ import javafx.application.Platform;
 
 public class ControlFormCard {
 
-	@FXML
-	private Button bttConsulta;
-	@FXML
-	private TextField txtTarjeta1;
-	@FXML
-	private TextArea txtAreaResultado;
-	@FXML
-	private Button bttCreacion;
-	@FXML
-	private TextField txtTarjeta2;
-	@FXML
-	private DatePicker datepk1;
-	@FXML
-	private ComboBox<Titular> cmbTitular;
-	@FXML
-	private RadioButton radio1; // Débito
-	@FXML
-	private RadioButton radio2; // Crédito
-	@FXML
-	private ToggleGroup tipo;
+    @FXML
+    private Button bttConsulta;
+    @FXML
+    private TextField txtSeguro1;
+    @FXML
+    private TextArea txtAreaResultado;
+    @FXML
+    private Button bttCreacion;
+    @FXML
+    private TextField txtSeguro2;
+    @FXML
+    private DatePicker datepk1;
+    @FXML
+    private ComboBox<Asegurado> cmbAsegurado;
+    @FXML
+    private TextField txtExtra;
+    @FXML
+    private RadioButton radio1; // Seguro Vida
+    @FXML
+    private RadioButton radio2; // Seguro Vehículo
+    @FXML
+    private ToggleGroup tipo;
 
-	private DAOTarjeta daoTarjeta;
+    private DAOSeguro daoSeguro;
+    private DAOAsegurado daoAsegurado;
 
-	private DAOTitular daoTitular;
+    @FXML
+    private void initialize() {
+        daoSeguro = new DAOSeguro();
+        daoAsegurado = new DAOAsegurado();
 
-	@FXML
-	private void initialize() {
-		daoTarjeta = new DAOTarjeta();
-		daoTitular = new DAOTitular();
+        datepk1.setValue(LocalDate.now());
 
-		datepk1.setValue(LocalDate.now());
+        List<Asegurado> lista;
 
-		List<Titular> lista = null;
-		try {
-			lista = daoTitular.readall();
-		} catch (Exception e) {
-			mostrarAlerta(e.getMessage());
-		}
-		cmbTitular.getItems().setAll(lista);
+        try {
+            lista = daoAsegurado.readall();
+        } catch (Exception e) {
+            mostrarAlerta(e.getMessage());
+            lista = List.of(); 
+        }
 
-		txtTarjeta1.focusedProperty().addListener((obs, oldVal, newVal) -> {
-			if (!newVal)
-				validarSoloNumeros(txtTarjeta1);
-		});
+        cmbAsegurado.getItems().setAll(lista);
 
-		txtTarjeta2.focusedProperty().addListener((obs, oldVal, newVal) -> {
-			if (!newVal)
-				validarSoloNumeros(txtTarjeta2);
-		});
+        txtSeguro1.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal)
+                validarSoloNumeros(txtSeguro1);
+        });
 
-	}
+        txtSeguro2.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal)
+                validarSoloNumeros(txtSeguro2);
+        });
+    }
 
-	@FXML
-	private void pressConsulta(ActionEvent event) {
-		txtAreaResultado.setText("");
-		if (!txtTarjeta1.getText().isBlank() || !txtTarjeta1.getText().isEmpty()) {
-			try {
-				Tarjeta t = daoTarjeta.readone(txtTarjeta1.getText());
+    @FXML
+    private void pressConsulta(ActionEvent event) {
+        txtAreaResultado.setText("");
+        if (!txtSeguro1.getText().isBlank() || !txtSeguro1.getText().isEmpty()) {
+            try {
+                Seguro s = daoSeguro.readone(txtSeguro1.getText());
+                if (s != null)
+                    txtAreaResultado.setText(s.toString());
+                else
+                    mostrarAlerta("No existe el numero de seguro");
+            } catch (Exception e) {
+                mostrarAlerta(e.getMessage());
+            }
+        } else
+            mostrarAlerta("Ingrese número de seguro");
+    }
 
-				if (t != null)
-					txtAreaResultado.setText(t.toString());
-				else
-					mostrarAlerta("No existe el numero de tarjeta");
-			} catch (Exception e) {
-				mostrarAlerta(e.getMessage());
-			}
-		} else
-			mostrarAlerta("Ingrese número de tarjeta");
-	}
+    @FXML
+    private void pressCreacion(ActionEvent event) {
 
-	@FXML
-	private void pressCreacion(ActionEvent event) {
+        String numero = txtSeguro2.getText().trim();
+        if (numero.isEmpty()) {
+            mostrarAlerta("⚠ Ingrese el número de seguro.");
+            return;
+        }
 
-		String numero = txtTarjeta2.getText().trim();
-		if (numero.isEmpty()) {
-			mostrarAlerta("⚠ Ingrese el número de tarjeta.");
-			return;
-		}
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaExp = datepk1.getValue().format(formatter);
+        if (fechaExp == null || fechaExp.isEmpty()) {
+            mostrarAlerta("⚠ Seleccione la fecha de expedición.");
+            return;
+        }
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String fechaExp = datepk1.getValue().format(formatter);
-		if (fechaExp == null || fechaExp.isEmpty()) {
-			mostrarAlerta("⚠ Seleccione la fecha de expedición.");
-			return;
-		}
+        Asegurado asegurado = cmbAsegurado.getValue();
+        if (asegurado == null) {
+            mostrarAlerta("⚠ Seleccione un asegurado.");
+            return;
+        }
 
-		Titular titular = cmbTitular.getValue();
-		if (titular == null) {
-			mostrarAlerta("⚠ Seleccione un titular.");
-			return;
-		}
+        String extra = txtExtra.getText().trim();
+        if (extra.isEmpty()) {
+            mostrarAlerta("⚠ Ingrese el beneficiario o la marca.");
+            return;
+        }
 
-		Tarjeta nueva;
+        Seguro nuevo;
+        if (radio1.isSelected()) {
+            nuevo = new SeguroVida(numero, fechaExp, true, asegurado, extra);
+        } else {
+            nuevo = new SeguroVehiculo(numero, fechaExp, true, asegurado, extra);
+        }
 
-		if (radio1.isSelected()) {
-			nueva = new Debito(numero, fechaExp, true, titular, 0.0);
-		} else {
-			nueva = new Credito(numero, fechaExp, true, titular, 1000000);
-		}
+        try {
+            String resultado = daoSeguro.create(nuevo);
+            mostrarAlerta(resultado);
+            if (resultado.startsWith("✔")) {
+                limpiarFormCrear();
+            }
+        } catch (Exception e) {
+            mostrarAlerta(e.getMessage());
+        }
+    }
 
-		try {
-			String resultado = daoTarjeta.create(nueva);
-			mostrarAlerta(resultado);
-			if (resultado.startsWith("✔")) {
-				limpiarFormCrear();
-			}
-		} catch (Exception e) {
-			mostrarAlerta(e.getMessage());
-		}
+    private void mostrarAlerta(String mensaje) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Resultado");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 
-	}
+    private void limpiarFormCrear() {
+        txtSeguro2.clear();
+        datepk1.setValue(null);
+        cmbAsegurado.setValue(null);
+        txtExtra.clear();
+        radio1.setSelected(true);
+    }
 
-	private void mostrarAlerta(String mensaje) {
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Resultado");
-		alert.setHeaderText(null);
-		alert.setContentText(mensaje);
-		alert.showAndWait();
-	}
-
-	private void limpiarFormCrear() {
-		txtTarjeta2.clear();
-		datepk1.setValue(null);
-		cmbTitular.setValue(null);
-		radio1.setSelected(true);
-	}
-
-	private void validarSoloNumeros(TextField txt) {
-		String texto = txt.getText().trim();
-		if (!texto.isBlank()) {
-			if (!texto.matches("\\d+")) {
-				txtAreaResultado.setText("");
-				txt.setStyle("-fx-border-color: red;");
-				mostrarAlerta("Solo números son permitidos!");
-				txt.setText("");
-				Platform.runLater(() -> txt.requestFocus());
-			} else {
-				txt.setStyle("");
-			}
-		} else
-			txt.setStyle("");
-	}
-
+    private void validarSoloNumeros(TextField txt) {
+        String texto = txt.getText().trim();
+        if (!texto.isBlank()) {
+            if (!texto.matches("\\d+")) {
+                txtAreaResultado.setText("");
+                txt.setStyle("-fx-border-color: red;");
+                mostrarAlerta("Solo números son permitidos!");
+                txt.setText("");
+                Platform.runLater(() -> txt.requestFocus());
+            } else {
+                txt.setStyle("");
+            }
+        } else
+            txt.setStyle("");
+    }
 }
